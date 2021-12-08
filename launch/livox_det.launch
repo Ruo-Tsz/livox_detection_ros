@@ -1,0 +1,45 @@
+<!-- whole pipeline for livox object detection before tracking -->
+<launch>
+    <!-- transform all pointcloud from different lidar to base_link frame -->
+    <node pkg="merge_lidars" type="merge_lidars_node" name="merge_five_lidars">
+        <!-- <param name="input_topics" value="/velodyne_points" /> -->
+        <param name="input_topics" value="/compensate_point" />
+        <param name="output_frame" value="base_link" />
+        <param name="output_topic_name" value="/velodyne_points_base" />
+    </node>
+
+    <!-- voxelize before det -->
+    <node pkg="cloud2voxel" type="cloud2voxel_node" name="cloud2voxel_node">
+        <remap from="/velodyne_points" to="/velodyne_points_base" />
+    </node>
+    
+    <!-- detection inference -->
+    <node
+        pkg="livox_detection"
+        type="livox_rosdetection_new.py"
+        name="livox_detection">
+        <remap from="/detect_box3d" to="/top_detect_box3d" />
+    </node>
+    
+    <!-- filter box output to msg -->
+    <node
+        pkg="livox_object_filter"
+        type="livox_object_filter_node"
+        name="livox_object_filter_node_top"
+        output="screen">
+        <param name="input_object_topic" value="/top_detect_box3d" />
+        <param name="input_cloud_topic" value="/velodyne_points_base" />
+        <param name="output_topic" value="/livox_filtered_lidar_objects" />
+        <param name="output_hull" value="/livox_filtered_cluster_hulls" />
+    </node>
+
+    <!-- publish static_tf of base_link v velodyne_2 and velodyne_3 -->
+    <!-- arg ="trans_x trans_y trans_z rot_x rot_y rot_z rot_w" -->
+    <node pkg="tf2_ros" type="static_transform_publisher"   name="v2_to_v"
+    args = "-1.75496 0.656365 -0.229237 0.67644519998 0.719014426172 -0.108926350966 0.116512645003 /velodyne /velodyne_2"/>
+    <node pkg="tf2_ros" type="static_transform_publisher"   name="v3_to_v"
+    args = "-1.70606 -0.827392 -0.149948 -0.699556395255 0.697348662842 0.108146706133 0.112383193773 /velodyne /velodyne_3"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="velodyne_frame_publisher"
+    args="0.0 0.0 0.0 0.0 0.0 -0.013 1.000 /base_link /velodyne"/>
+
+</launch>
