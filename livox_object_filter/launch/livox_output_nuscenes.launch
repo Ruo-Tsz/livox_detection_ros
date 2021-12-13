@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- activate voxelize package -->
+    <!-- <node 
+        pkg="cloud2voxel"
+        name="voxe_top"
+        type="cloud2voxel_node">
+        <remap from="/velodyne_points" to="/nuscenes_lidar"/>
+    </node>
+
+    <node 
+        pkg="livox_detection"
+        name="livox_DL"
+        type="livox_rosdetection_new.py">
+        <param name="min_x" value="-89.6" />
+        <param name="max_x" value="89.6" />
+        <param name="min_y" value="-49.4" />
+        <param name="max_y" value="49.4" />
+        <param name="min_z" value="-3.0" />
+        <param name="max_z" value="3.0" />
+        <param name="voxel_size" value="0.2" />
+        <param name="overlap" value="11.2" />
+        <remap from="/detect_box3d" to="/top_detect_box3d"/>
+        <remap from="/text_det" to="/top_text_det"/>
+    </node> -->
+
+    <!-- object filter -->
+    <node
+        pkg="livox_object_filter"
+        type="livox_object_filter_node"
+        name="livox_object_filter_node_top"
+        output="screen">
+        <param name="input_object_topic" value="/top_detect_box3d" />
+        <param name="input_cloud_topic" value="/nuscenes_lidar" />
+        <param name="output_topic" value="/filtered_top_livox_detection" />
+        <param name="output_hull_topic" value="/filtered_top_cluster_hulls" />
+        <param name="is_output" value="true"   />
+        <param name="output_frame" value="/map" />
+    </node>
+
+</launch>

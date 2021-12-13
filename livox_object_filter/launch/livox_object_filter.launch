@@ -1,0 +1,10 @@
+<launch>
+    <node
+        pkg="livox_object_filter"
+        type="livox_object_filter_node"
+        name="livox_object_filter_node_top"
+        output="screen">
+        <param name="input_object_topic" value="/top_detect_box3d" />
+        <param name="input_cloud_topic" value="/top_detection_points" />
+    </node>
+</launch>
