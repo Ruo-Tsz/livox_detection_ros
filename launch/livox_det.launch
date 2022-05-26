@@ -7,9 +7,18 @@
         <param name="output_topic_name" value="/velodyne_points_base" />
     </node>
 
+    <node 
+        pkg="motion_compensation" 
+        type="motion_compensation_node"  
+        name="motion_compensation"> 
+        <param name="input_cloud" value="/velodyne_points_base"/>
+        <param name="output_cloud" value="/compensated_velodyne_points"/>
+        <param name="ang_resolusion" value="5"/>
+    </node>
+
     <!-- voxelize before det -->
     <node pkg="cloud2voxel" type="cloud2voxel_node" name="cloud2voxel_node">
-        <remap from="/velodyne_points" to="/velodyne_points_base" />
+        <remap from="/velodyne_points" to="/compensated_velodyne_points" />
     </node>
     
     <!-- detection inference -->
@@ -26,7 +35,7 @@
         type="livox_object_filter_node"
         name="livox_object_filter_node_top">
         <param name="input_object_topic" value="/top_detect_box3d" />
-        <param name="input_cloud_topic" value="/velodyne_points_base" />
+        <param name="input_cloud_topic" value="/compensated_velodyne_points" />
         <param name="output_topic" value="/livox_filtered_lidar_objects" />
         <param name="output_hull" value="/livox_filtered_cluster_hulls" />
     </node>
