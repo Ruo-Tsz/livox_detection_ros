@@ -6,6 +6,7 @@ import copy
 import config.config as cfg
 from networks.model import *
 import lib_cpp
+import rospkg
 
 import time
 
@@ -73,7 +74,8 @@ class Detector(object):
                 config.log_device_placement = False
                 config.gpu_options.per_process_gpu_memory_fraction= 0.4
                 self.sess = tf.Session(config=config)
-                saver.restore(self.sess, "/home/ee904/catkin_ws_itri/src/livox_detection_ros/livox_detection/model/livoxmodel")
+                pkg_path = rospkg.RosPack().get_path('livox_detection')
+                saver.restore(self.sess, pkg_path+"/model/livoxmodel")
                 self.ops = {'input_bev_img_pl': input_bev_img_pl,  # input
                             'end_points': end_points,  # output
                             }
