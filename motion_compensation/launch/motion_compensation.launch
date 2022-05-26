@@ -1,0 +1,10 @@
+<launch>
+    <node 
+        pkg="motion_compensation" 
+        type="motion_compensation_node"  
+        name="motion_compensation_node" 
+        output="screen" > 
+        <param name="input_cloud" value="/velodyne_points"/>
+        <param name="ang_resolusion" value="5"/>
+    </node>
+</launch>
