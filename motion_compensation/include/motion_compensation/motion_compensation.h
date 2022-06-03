@@ -10,6 +10,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <chrono>
 #include <point_container.h>
+#include <std_srvs/SetBool.h>
 
 class MotionCompensation
 {
@@ -17,6 +18,7 @@ class MotionCompensation
         ros::NodeHandle mNodeHandler, mPrivateHandler;
         ros::Subscriber mSubScan;
         ros::Publisher mPubScan, mPubScanOrder, mPubGridSlice;
+        ros::ServiceClient mBagClient;
         tf::StampedTransform mLastTransform, mCurrentTransform;
         tf::TransformListener mListener;
         std::string mInputCloud, mOutputCloud;
@@ -25,6 +27,7 @@ class MotionCompensation
         float mStartAzi;
         bool mClockwise;
 
+        void PauseBagSrv();
         void Callback(const sensor_msgs::PointCloud2ConstPtr &msg);
         void getScanRotation(
             const pcl::PointCloud<pcl::PointXYZI>::Ptr& inCloud,

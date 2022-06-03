@@ -28,6 +28,7 @@ MotionCompensation::MotionCompensation()
     mPubScan = mNodeHandler.advertise<sensor_msgs::PointCloud2>(mOutputCloud, 1);
     mPubScanOrder = mPrivateHandler.advertise<sensor_msgs::PointCloud2>("scaning_order", 1);
     mPubGridSlice = mPrivateHandler.advertise<visualization_msgs::MarkerArray>("grid_slice_map", 1);
+    mBagClient = mNodeHandler.serviceClient<std_srvs::SetBool>("/playback/pause_playback");
 }
 
 void MotionCompensation::Run()
@@ -38,6 +39,21 @@ void MotionCompensation::Run()
         ros::spin();
         loopRate.sleep();
     }
+}
+
+void MotionCompensation::PauseBagSrv()
+{
+    // need to put after listen to tf, before callback return
+    std_srvs::SetBool pause_bag_srv;
+    pause_bag_srv.request.data = true;
+    if(mBagClient.call(pause_bag_srv))
+    {
+        ROS_INFO("%s for %lf",pause_bag_srv.response.message.c_str(), mCurrentHeader.stamp.toSec());
+    }
+    else
+    {
+        ROS_ERROR("Failed to pause bag");
+    }    
 }
 
 void MotionCompensation::Callback(const sensor_msgs::PointCloud2ConstPtr &msg)
@@ -59,6 +75,7 @@ void MotionCompensation::Callback(const sensor_msgs::PointCloud2ConstPtr &msg)
     {
         // Not get current tf
         ROS_WARN("%s",ex.what());
+        PauseBagSrv();
         mPubScan.publish(msg);
         return;
     }
@@ -67,6 +84,7 @@ void MotionCompensation::Callback(const sensor_msgs::PointCloud2ConstPtr &msg)
     {
         // Not get last tf
         std::cout << "First frame, no compensation\n";
+        PauseBagSrv();
         mPubScan.publish(msg);
         return;
     }
@@ -78,10 +96,12 @@ void MotionCompensation::Callback(const sensor_msgs::PointCloud2ConstPtr &msg)
     if(inCloud->points.size() == 0)
     {
         ROS_WARN("No points in scan");
+        PauseBagSrv();
         mPubScan.publish(msg);
         return;
     }
 
+    PauseBagSrv();
     getScanRotation(
         inCloud,
         mStartAzi,
