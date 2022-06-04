@@ -1,5 +1,5 @@
 # livox_detection_ros
-It's a package to run LIVOX detector on ros node.
+It's a package to run [LIVOX detector](https://github.com/Livox-SDK/livox_detection.git) on ros node.
 
 ## 1. build package
 ```
