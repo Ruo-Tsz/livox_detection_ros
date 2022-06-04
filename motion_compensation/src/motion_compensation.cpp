@@ -24,7 +24,7 @@ MotionCompensation::MotionCompensation()
     ROS_INFO("Ang_resolusion: %lf [deg]", mAngResol);
     // mOutputCloud = "Compensated/" + mInputCloud;
 
-    mSubScan = mNodeHandler.subscribe(mInputCloud, 1, &MotionCompensation::Callback, this);
+    mSubScan = mNodeHandler.subscribe(mInputCloud, 100, &MotionCompensation::Callback, this);
     mPubScan = mNodeHandler.advertise<sensor_msgs::PointCloud2>(mOutputCloud, 1);
     mPubScanOrder = mPrivateHandler.advertise<sensor_msgs::PointCloud2>("scaning_order", 1);
     mPubGridSlice = mPrivateHandler.advertise<visualization_msgs::MarkerArray>("grid_slice_map", 1);
