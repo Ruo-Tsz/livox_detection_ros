@@ -85,8 +85,9 @@ namespace ObjectFilter
         //  transform to global frame
         try
         {
-            mListener.waitForTransform("/map", "/base_link", mHeader.stamp, ros::Duration(1.0));
-            mListener.lookupTransform("/map", "/base_link", mHeader.stamp, mTransform);
+            // last 3 digit in nano-sec would shift in markers, use cloud stamp for correct tf
+            mListener.waitForTransform("/map", "/base_link", current_cloud.header.stamp, ros::Duration(1.0));
+            mListener.lookupTransform("/map", "/base_link", current_cloud.header.stamp, mTransform);
         }
         catch (tf::TransformException ex)
         {
